@@ -1,9 +1,7 @@
 const express = require("express");
 const { user_Task } = require("../Model/Task.model");
 const task = express.Router();
-
-
-//create_task route
+const socket=require("../Socket/socket");
 task.post("/create_Task", async (req, res) => {
   console.log(req.body);
   try {
@@ -32,6 +30,7 @@ task.post("/create_Task", async (req, res) => {
     });
 
     await task.save();
+    socket.emit("taskCreated",`New task has been created by ${username}`);
     res.status(200).send({ message: "Task Added Successfully" });
   } catch (error) {
     res.status(400).send({ message: error.message });
@@ -48,7 +47,6 @@ task.get("/", async (req, res) => {
     res.status(400).send({ message: error.message, route: "/ route of task" });
   }
 });
-
 
 //filter task
 
@@ -83,8 +81,7 @@ task.get("/filter_task", async (req, res) => {
   }
 });
 
-
-//patch request 
+//patch request
 
 task.patch("/update_task/:id", async (req, res) => {
   const { id } = req.params;
@@ -99,12 +96,13 @@ task.patch("/update_task/:id", async (req, res) => {
     }
     task.status = !task.status;
     await task.save();
-    res
-      .status(200)
-      .send({
-        message: "Task status updated successfully",
-        status: task.status,
-      });
+    
+    socket.emit("taskCreated",`New task has been updated as ${task.status?"Completed":"Pending"} by ${task.name}`);
+
+    res.status(200).send({
+      message: "Task status updated successfully",
+      status: task.status,
+    });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
@@ -112,25 +110,26 @@ task.patch("/update_task/:id", async (req, res) => {
 
 //sort requests
 
-task.get('/sort', async (req, res) => {
+task.get("/sort", async (req, res) => {
   const { sortBy, sortOrder } = req.query;
+  console.log(sortBy, sortOrder);
   const sortCriteria = {};
 
-  if (sortBy === 'status' || sortBy === 'dueDate' || sortBy === 'priority') {
-    sortCriteria[sortBy] = sortOrder === 'desc' ? -1 : 1;
+  if (sortBy === "status" || sortBy === "dueDate" || sortBy === "priority") {
+    sortCriteria[sortBy] = sortOrder === "desc" ? -1 : 1;
   } else {
-    return res.status(400).json({ message: 'Invalid sortBy criteria' });
+    return res.status(400).json({ message: "Invalid sortBy criteria" });
   }
 
   try {
-    const sortedTasks = await user_Task.find({ id: req.body.id }).sort(sortCriteria);
+    const sortedTasks = await user_Task
+      .find({ id: req.body.id })
+      .sort(sortCriteria);
     res.status(200).json(sortedTasks);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
-
-
 
 //delete request   ./////
 
@@ -144,6 +143,8 @@ task.delete("/delete_task/:id", async (req, res) => {
         .send({ message: "You are not allowed to delete others task" });
     } else {
       await user_Task.findByIdAndDelete({ _id: id });
+      socket.emit("taskCreated",`New task has been delted by ${data.name}`);
+
       res
         .status(200)
         .send({ message: "The Task Has Been Deleted Successfully" });
