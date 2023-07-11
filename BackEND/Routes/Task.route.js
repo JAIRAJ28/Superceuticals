@@ -2,7 +2,8 @@ const express = require("express");
 const { user_Task } = require("../Model/Task.model");
 const task = express.Router();
 const socket=require("../Socket/socket");
-task.post("/create_Task", async (req, res) => {
+
+task.post("/", async (req, res) => {
   console.log(req.body);
   try {
     const { title, description, dueDate, id, username } = req.body;
@@ -42,7 +43,11 @@ task.get("/", async (req, res) => {
   const id = req.body.id;
   try {
     const tasks = await user_Task.find({ id });
-    res.status(200).send({ message: tasks });
+    if(tasks.length > 0) {
+    res.status(200).send(tasks);
+    }else{
+      res.status(400).send("No task present");
+    }
   } catch (error) {
     res.status(400).send({ message: error.message, route: "/ route of task" });
   }

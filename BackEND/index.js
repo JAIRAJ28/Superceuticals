@@ -38,26 +38,23 @@ Server.listen(process.env.PORT, async () => {
   try {
     await connect;
     console.log("HELLO FORM index.js listen");
-    io.on("connection", (socket) => {
-      console.log("User connected");
-    });
-    // Listen for task created events
-    io.on("taskCreated", (data) => {
+  
+    // io.on("taskCreated", (data) => {
       // Send a message to all connected clients
-      io.emit("taskCreated", data);
-    });
+    //   io.emit("taskCreated", data);
+    // });
 
     // Listen for task deleted events
-    io.on("taskDeleted", (data) => {
+    // io.on("taskDeleted", (data) => {
       // Send a message to all connected clients
-      io.emit("taskDeleted", data);
-    });
+    //   io.emit("taskDeleted", data);
+    // });
 
-    // Listen for task updated events
-    io.on("taskUpdated", (data) => {
+    // // Listen for task updated events
+    // io.on("taskUpdated", (data) => {
       // Send a message to all connected clients
-      io.emit("taskUpdated", data);
-    });
+    //   io.emit("taskUpdated", data);
+    // });
   } catch (error) {
     console.log(error, "In the index.js listen");
   }
