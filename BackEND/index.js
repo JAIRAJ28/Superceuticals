@@ -11,6 +11,7 @@ const { auth } = require("./Middlewares/Auth");
 const { task } = require("./Routes/Task.route");
 const Server = http.createServer(app);
 app.use(cors());
+const io = Socket(Server);
 require("dotenv").config();
 app.use(express.json())
 app.get("/", async (req, res) => {

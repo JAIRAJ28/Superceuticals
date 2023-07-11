@@ -5,7 +5,7 @@ const taskSchema = new mongoose.Schema({
   description: {  type: String, required: true},
   dueDate: {type: Date,required: true},
   status: {type: Boolean, required: true},
-  priority: {type: String, enum: ["High", "Medium", "Low"], required: true },
+  priority: {type: String, enum: ["HIGH", "MEDIUM", "LOW"], required: true },
   id: {type: String, required: true},
   name: {type: String, required: true}
 },
