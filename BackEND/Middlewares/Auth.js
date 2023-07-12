@@ -7,9 +7,10 @@ const auth=async(req,res,next)=>{
    try {
     if(token){
        const decoded=jwt.verify(token.split(" ")[1]||token,"superneutic")
+       console.log(token)
        if(decoded){
         req.body.username=decoded.name
-        req.body.id=decoded.id
+        req.body.myid=decoded.id
         next(); 
     } else {
         res.send({ msg: "Please Login first" });

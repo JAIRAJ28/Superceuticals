@@ -1,0 +1,55 @@
+/* Define your CSS styles here */
+.container {
+    margin: 20px;
+  }
+  
+  h3 {
+    color: #333;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  thead {
+    background-color: #f2f2f2;
+  }
+  
+  th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .redbox {
+    background-color: rgb(224, 142, 142);
+    color: white;
+  }
+  
+  .greenbox {
+    background-color: green;
+    color: white;
+  }
+  
+  .RedBox {
+    background-color: rgb(215, 129, 129);
+    color: white;
+  }
+  .low{
+    background-color: beige;
+  }
+  .Greenbox {
+    background-color: rgb(129, 194, 129);
+    color: white;
+  }
+  
+  .noData {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+  }
+  
+
+  

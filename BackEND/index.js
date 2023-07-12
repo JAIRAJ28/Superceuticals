@@ -12,7 +12,12 @@ require("dotenv").config();
 
 
 const Server = http.createServer(app);
-const io = new Socket.Server(Server);
+const io = Socket(Server,{
+  cors: {
+    origin: "*", // Allow requests from this origin
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allow specified methods
+  },
+});
 
 app.use(express.json())
 app.get("/", async (req, res) => {
@@ -31,6 +36,11 @@ app.get("/", async (req, res) => {
 app.use("/users",signin)
 app.use(auth)
 app.use("/task",task)
+
+io.on("connection", (socket) => {
+  console.log("User connected");
+   
+});
 
 
 

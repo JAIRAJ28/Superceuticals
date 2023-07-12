@@ -3,10 +3,10 @@ const { user_Task } = require("../Model/Task.model");
 const task = express.Router();
 const socket=require("../Socket/socket");
 
-task.post("/", async (req, res) => {
+task.post("/createTask", async (req, res) => {
   console.log(req.body);
   try {
-    const { title, description, dueDate, id, username } = req.body;
+    const { title, description, dueDate, myid, username } = req.body;
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
     const due = new Date(dueDate);
@@ -26,7 +26,7 @@ task.post("/", async (req, res) => {
       dueDate,
       status: false,
       priority: priority.toUpperCase(),
-      id: id,
+      myid: myid,
       name: username,
     });
 
@@ -37,12 +37,23 @@ task.post("/", async (req, res) => {
     res.status(400).send({ message: error.message });
   }
 });
-
+task.get("/all",async(req,res)=>{
+  try {
+    const task = await user_Task.find()
+    if(task.length > 0) {
+    res.status(200).send(task);
+    }else{
+      res.status(400).send("No task present");
+    }
+  } catch (error) {
+    res.status(400).send({ message: error.message, route: "/all route of task" });
+  }
+})
 //get the task route
 task.get("/", async (req, res) => {
-  const id = req.body.id;
+  const myid = req.body.myid;
   try {
-    const tasks = await user_Task.find({ id });
+    const tasks = await user_Task.find({ myid });
     if(tasks.length > 0) {
     res.status(200).send(tasks);
     }else{
@@ -53,14 +64,16 @@ task.get("/", async (req, res) => {
   }
 });
 
+
 //filter task
+
 
 task.get("/filter_task", async (req, res) => {
   const { status, priority, dueDate } = req.query;
   console.log(status, priority, dueDate);
   try {
     const filter = {
-      id: req.body.id,
+      myid: req.body.myid,
       priority: "HIGH",
     };
     if (status) {
@@ -79,7 +92,7 @@ task.get("/filter_task", async (req, res) => {
     if (tasks.length) {
       res.status(200).send(tasks);
     } else {
-      res.status(200).send({ message: "No task found" });
+      res.status(400).send({ message: "No task found" });
     }
   } catch (error) {
     res.status(400).send({ message: error.message });
@@ -96,7 +109,7 @@ task.patch("/update_task/:id", async (req, res) => {
     if (!task) {
       return res.status(404).send({ message: "Task not found" });
     }
-    if (req.body.id !== task.id) {
+    if (req.body.myid !== task.myid) {
       return res.status(403).send({ message: "You cannot update others task" });
     }
     task.status = !task.status;
@@ -128,7 +141,7 @@ task.get("/sort", async (req, res) => {
 
   try {
     const sortedTasks = await user_Task
-      .find({ id: req.body.id })
+      .find({ myid: req.body.myid })
       .sort(sortCriteria);
     res.status(200).json(sortedTasks);
   } catch (error) {
@@ -140,9 +153,11 @@ task.get("/sort", async (req, res) => {
 
 task.delete("/delete_task/:id", async (req, res) => {
   const { id } = req.params;
-  const data = await user_Task.findById(id);
+  console.log(id)
+  const data = await user_Task.findById({_id:id});
+  console.log(data, {id})
   try {
-    if (req.body.id !== data.id) {
+    if (req.body.myid !== data.myid) {
       res
         .status(401)
         .send({ message: "You are not allowed to delete others task" });
